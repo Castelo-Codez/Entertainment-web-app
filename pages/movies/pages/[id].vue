@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
-
+import {
+    Pagination,
+    PaginationEllipsis,
+    PaginationList,
+    PaginationListItem,
+} from "@/components/ui/pagination";
 const $router = useRoute();
 const nuxtApp = useNuxtApp();
 const url = `https://api.themoviedb.org/3/movie/${$router.query.search}?language=en-US&page=${$router.params.id}`;
@@ -9,18 +14,13 @@ const url = `https://api.themoviedb.org/3/movie/${$router.query.search}?language
 const {data}: any = await useFetch(url as string, {
     headers: {
         accept: "application/json",
-        Authorization: process.env.API_KEY,
+        Authorization:
+            process.env.API_KEY as string,
     },
     getCachedData(key) {
         return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
     },
 });
-import {
-    Pagination,
-    PaginationEllipsis,
-    PaginationList,
-    PaginationListItem,
-} from "@/components/ui/pagination";
 
 </script>
 
@@ -187,7 +187,6 @@ import {
                     </template>
                 </PaginationList>
             </Pagination>
-    
         </section>
     </div>
 </template>

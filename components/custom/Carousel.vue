@@ -1,6 +1,4 @@
 <script setup lang="ts">
-
-
 interface Props {
     url?: string;
     carouselName?: string;
@@ -14,13 +12,13 @@ import {
     CarouselItem,
 } from "@/components/ui/carousel";
 import {Badge} from "@/components/ui/badge";
-
 const url = $props.url;
 
 const {data} = await useFetch(url as string, {
     headers: {
         accept: "application/json",
-        Authorization: process.env.API_KEY as string,
+        Authorization:
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4Zjc5NmUwMDExM2JkMDAwZDk4ZWE0YzI3MmY1ZmM5YyIsIm5iZiI6MTczMTA1MjQzNi44NTE5OTA3LCJzdWIiOiI2NzJiN2EzY2RlNTQ2NTg1ZDA0ZDk3YjkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.KD3HjY_D8OWtE4QY-dhaV6n5pIeiwk5Xvr8UqS9zrzg",
     },
     getCachedData(key) {
         return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
@@ -125,6 +123,7 @@ const {results}: any = data.value;
                                         </svg>
                                         {{ mv.vote_average }}
                                     </span>
+     
                                 </h4>
                             </article>
                         </div>
@@ -133,6 +132,5 @@ const {results}: any = data.value;
             </CarouselContent>
         </Carousel>
     </section>
-
 </template>
 <style scoped></style>

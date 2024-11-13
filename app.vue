@@ -11,11 +11,18 @@ useHead({
         lang: "en",
     },
 });
+
+const user = useCurrentUser();
+const headers = useRequestHeaders(["cookie"]) as HeadersInit;
+
+await callOnce(async () => {
+    user.value = await $fetch("/api/users/getCurrentUser", {headers});
+});
 </script>
 
 <template>
     <div>
-        <NuxtLoadingIndicator :height="2" :throttle="0" :duration="5000" />
+        <NuxtLoadingIndicator :height="4" :throttle="0" :duration="5000" />
         <NuxtLayout>
             <NuxtPage />
         </NuxtLayout>

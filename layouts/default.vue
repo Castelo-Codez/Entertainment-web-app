@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sheet";
 import {Input} from "@/components/ui/input";
 import {MagnifyingGlassIcon} from "@radix-icons/vue";
+import {Button} from "@/components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,10 +18,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-const searchText = useSearch();
-
-
-
+const {data, signOut} = useAuth();
+const changeTheme = useColorMode();
+const user = useCurrentUser();
+function $changeTheme() {
+    return changeTheme.preference === "dark"
+        ? (changeTheme.preference = "light")
+        : (changeTheme.preference = "dark");
+}
 </script>
 
 <template>
@@ -70,7 +75,7 @@ const searchText = useSearch();
                                 <li role="listitem" class="mb-5 px-1">
                                     <RouterLink
                                         to="/"
-                                        class="flex gap-x-4 items-center rounded-md py-1"
+                                        class="flex gap-x-4 mb-5 items-center rounded-md py-1"
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -85,6 +90,24 @@ const searchText = useSearch();
                                         </svg>
                                         <span>Explore</span>
                                     </RouterLink>
+                                    <RouterLink
+                                        to="/movies/favourites"
+                                        class="flex gap-x-4 mb-5 items-center rounded-md py-1"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="32"
+                                            height="32"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                class="fill-red-600"
+                                                d="M11.98 19.094q-.291 0-.577-.106q-.286-.105-.503-.323L9.752 17.63q-2.67-2.425-4.71-4.717Q3 10.622 3 8.15q0-1.908 1.296-3.204T7.5 3.65q1.094 0 2.279.553T12 6.289q1.037-1.533 2.221-2.086T16.5 3.65q1.908 0 3.204 1.296T21 8.15q0 2.529-2.125 4.862t-4.652 4.622l-1.142 1.031q-.218.218-.513.323t-.587.106"
+                                            />
+                                        </svg>
+
+                                        <span>Favourites</span>
+                                    </RouterLink>
                                 </li>
                             </ul>
                         </SheetContent>
@@ -98,7 +121,6 @@ const searchText = useSearch();
                             type="text"
                             placeholder="Search..."
                             class="pl-10"
-                            v-model="searchText"
                         />
                         <span
                             class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
@@ -116,7 +138,14 @@ const searchText = useSearch();
                             size="icon"
                             class="rounded-full"
                         >
+                            <img
+                                :src="data.user.image"
+                                :alt="user.username"
+                                v-if="user.username"
+                                class="max-w-none w-[25px] h-[25px] rounded-full"
+                            />
                             <svg
+                                v-else
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="25"
                                 height="25"
@@ -131,16 +160,28 @@ const searchText = useSearch();
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent class="w-56 md:hidden">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                            class="flex justify-between items-center"
+                        <DropdownMenuLabel
+                            class="capitalize"
+                            v-if="user.username"
+                            >{{ user.username }}</DropdownMenuLabel
                         >
-                            <span>Log out</span>
-                            <DropdownMenuShortcut class="text-muted-foreground"
-                                >⇧⌘Q</DropdownMenuShortcut
+                        <DropdownMenuLabel class="capitalize" v-else
+                            >SignIn</DropdownMenuLabel
+                        >
+                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                            <Button
+                                class="flex justify-between items-center w-full h-full p-0"
+                                @click="signOut"
+                                variant="outline"
                             >
+                                <span>log out </span>
+                                <DropdownMenuShortcut
+                                    class="text-muted-foreground"
+                                    >⇧⌘Q</DropdownMenuShortcut
+                                >
+                            </Button>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
@@ -179,8 +220,8 @@ const searchText = useSearch();
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    width="32"
-                                    height="32"
+                                    width="30"
+                                    height="30"
                                     viewBox="0 0 24 24"
                                 >
                                     <path
@@ -190,6 +231,45 @@ const searchText = useSearch();
                                 </svg>
                                 <span>Explore</span>
                             </RouterLink>
+                        </li>
+                        <li role="listitem" class="mb-5">
+                            <RouterLink
+                                to="/movies/favourites"
+                                class="flex gap-x-4 items-center rounded-md py-1"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="30"
+                                    height="30"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        class="fill-red-600"
+                                        d="M11.98 19.094q-.291 0-.577-.106q-.286-.105-.503-.323L9.752 17.63q-2.67-2.425-4.71-4.717Q3 10.622 3 8.15q0-1.908 1.296-3.204T7.5 3.65q1.094 0 2.279.553T12 6.289q1.037-1.533 2.221-2.086T16.5 3.65q1.908 0 3.204 1.296T21 8.15q0 2.529-2.125 4.862t-4.652 4.622l-1.142 1.031q-.218.218-.513.323t-.587.106"
+                                    />
+                                </svg>
+
+                                <span>Favourites</span>
+                            </RouterLink>
+                        </li>
+                        <li role="listitem">
+                            <button
+                                class="flex gap-x-4 items-center"
+                                @click="$changeTheme"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="32"
+                                    height="32"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        class="fill-black dark:fill-white"
+                                        d="M12.058 20q-3.334 0-5.667-2.333T4.058 12q0-3.039 1.98-5.27t4.904-2.634q.081 0 .159.006t.153.017q-.506.706-.801 1.57T10.158 7.5q0 2.667 1.866 4.533t4.534 1.867q.951 0 1.813-.295t1.548-.801q.012.075.017.153t.006.159q-.384 2.923-2.615 4.903T12.057 20"
+                                    />
+                                </svg>
+                                Change Theme
+                            </button>
                         </li>
                     </ul>
                 </section>
@@ -208,7 +288,6 @@ const searchText = useSearch();
                         type="text"
                         placeholder="Search For Movie Or Tv Series"
                         class="pl-10"
-                        v-model="searchText"
                     />
                     <span
                         class="absolute start-0 inset-y-0 flex items-center justify-center px-2"
@@ -221,12 +300,15 @@ const searchText = useSearch();
                 <section aria-label="prfile button & theme switcher wrapper">
                     <DropdownMenu>
                         <DropdownMenuTrigger as-child>
-                            <Button
-                                variant="secondary"
-                                size="icon"
-                                class="rounded-full"
-                            >
+                            <Button variant="secondary" size="icon">
+                                <img
+                                    :src="data.user.image"
+                                    :alt="user.username"
+                                    v-if="user.username"
+                                    class="max-w-none w-[25px] h-[25px] rounded-full"
+                                />
                                 <svg
+                                    v-else
                                     xmlns="http://www.w3.org/2000/svg"
                                     width="25"
                                     height="25"
@@ -243,17 +325,28 @@ const searchText = useSearch();
                         <DropdownMenuContent
                             class="w-56 large-screens-dropdown"
                         >
-                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                class="flex justify-between items-center"
+                            <DropdownMenuLabel
+                                class="capitalize"
+                                v-if="user.username"
+                                >{{ user.username }}</DropdownMenuLabel
                             >
-                                <span>Log out</span>
-                                <DropdownMenuShortcut
-                                    class="text-muted-foreground"
-                                    >⇧⌘Q</DropdownMenuShortcut
+                            <DropdownMenuLabel class="capitalize" v-else
+                                >SignIn</DropdownMenuLabel
+                            >
+                            <DropdownMenuSeparator />
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem>
+                                <Button
+                                    class="flex justify-between items-center w-full h-full p-0"
+                                    @click="signOut"
+                                    variant="none"
                                 >
+                                    <span>log out </span>
+                                    <DropdownMenuShortcut
+                                        class="text-muted-foreground"
+                                        >⇧⌘Q</DropdownMenuShortcut
+                                    >
+                                </Button>
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

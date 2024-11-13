@@ -1,2 +1,1 @@
-export const useSearch:any = () => useState<string>("searchKeyword", () => ref(""));
-
+export const useCurrentUser = () => useState<any>("user", () => {});
