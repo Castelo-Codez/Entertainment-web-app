@@ -3,7 +3,6 @@ import User from "~/server/model/User";
 import {connect} from "mongoose";
 export default defineEventHandler(async (event) => {
     const session: any = await getServerSession(event);
-
     return await connect(process.env.MONGO_URL as string).then(async () => {
         if (session) {
             const {user} = session;

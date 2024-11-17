@@ -20,7 +20,7 @@ export default defineNuxtConfig({
     },
     auth: {
         isEnabled: true,
-        originEnvKey: process.env.AUTH_KEY,
+        originEnvKey: "ADASDJA;SKDM541231A32D1SA1EAW35E1QW31A32C1A32D1A32D12AS12f23a1dsadasddase",
         baseURL: process.env.VERCEL_URL
             ? `https://${process.env.VERCEL_URL}/api/auth`
             : undefined,

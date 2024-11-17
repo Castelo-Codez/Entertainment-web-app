@@ -2,6 +2,7 @@
 import {Skeleton} from "@/components/ui/skeleton";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
+const {status, signIn} = useAuth();
 import {
     Drawer,
     DrawerClose,
@@ -12,7 +13,7 @@ import {
     DrawerTitle,
     DrawerTrigger,
 } from "@/components/ui/drawer";
-
+const showDrawer = ref(false);
 const $router = useRoute();
 console.log($router.redirectedFrom);
 const url = `https://api.themoviedb.org/3/movie/${$router.params.id}?language=en-US`;
@@ -20,7 +21,7 @@ const url = `https://api.themoviedb.org/3/movie/${$router.params.id}?language=en
 const {data}: any = await useFetch(url as string, {
     headers: {
         accept: "application/json",
-        Authorization: process.env.API_KEY as string,
+        Authorization: process.env.API_KEY,
     },
 });
 const Casturl = `https://api.themoviedb.org/3/movie/${$router.params.id}/credits?language=en-US`;
@@ -28,11 +29,52 @@ const Casturl = `https://api.themoviedb.org/3/movie/${$router.params.id}/credits
 const resp: any = await useFetch(Casturl as string, {
     headers: {
         accept: "application/json",
-        Authorization:
-            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4Zjc5NmUwMDExM2JkMDAwZDk4ZWE0YzI3MmY1ZmM5YyIsIm5iZiI6MTczMTA1MjQzNi44NTE5OTA3LCJzdWIiOiI2NzJiN2EzY2RlNTQ2NTg1ZDA0ZDk3YjkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.KD3HjY_D8OWtE4QY-dhaV6n5pIeiwk5Xvr8UqS9zrzg",
+        Authorization: process.env.API_KEY,
     },
 });
+
+const user = useCurrentUser();
 const cast = resp.data.value.cast;
+const isFav = computed((): boolean => {
+    if (!user.value.favMovies) {
+        return false;
+    }
+    let isF = user.value.favMovies.find(
+        (el: any) => el.original_title == data.value.original_title
+    );
+    return isF ? true : false;
+});
+const headers = useRequestHeaders(["cookie"]) as HeadersInit;
+function $addToFav(): void {
+    if (status.value === "unauthenticated") {
+        showDrawer.value = true;
+        return;
+    }
+    let $checkIfMovieIsFav = user.value.favMovies.find(
+        (el: any) => el.original_title == data.value.original_title
+    );
+    if ($checkIfMovieIsFav) {
+        user.value.favMovies = user.value.favMovies.filter(
+            (el: any) => el.original_title !== data.value.original_title
+        );
+        $fetch(`/api/movies/removemovie/${$checkIfMovieIsFav.id}`, {
+            headers,
+            method: "POST",
+        });
+    } else {
+        user.value.favMovies.push(data.value);
+        $fetch("/api/movies/addmovie", {
+            headers,
+            method: "POST",
+            body: data.value,
+        });
+    }
+    document.body.style.position = "static";
+}
+
+function $logWithGithub() {
+    signIn("github");
+}
 </script>
 
 <template>
@@ -78,10 +120,24 @@ const cast = resp.data.value.cast;
                             >
                                 {{ data.original_title }}
                             </h1>
+
                             <Drawer>
                                 <DrawerTrigger>
-                                    <Button>
+                                    <Button @click="$addToFav">
                                         <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="32"
+                                            height="32"
+                                            viewBox="0 0 24 24"
+                                            v-if="isFav"
+                                        >
+                                            <path
+                                                class="fill-red-600"
+                                                d="M11.98 19.094q-.291 0-.577-.106q-.286-.105-.503-.323L9.752 17.63q-2.67-2.425-4.71-4.717Q3 10.622 3 8.15q0-1.908 1.296-3.204T7.5 3.65q1.094 0 2.279.553T12 6.289q1.037-1.533 2.221-2.086T16.5 3.65q1.908 0 3.204 1.296T21 8.15q0 2.529-2.125 4.862t-4.652 4.622l-1.142 1.031q-.218.218-.513.323t-.587.106"
+                                            />
+                                        </svg>
+                                        <svg
+                                            v-else
                                             xmlns="http://www.w3.org/2000/svg"
                                             width="32"
                                             height="32"
@@ -95,22 +151,44 @@ const cast = resp.data.value.cast;
                                     </Button>
                                 </DrawerTrigger>
                                 <DrawerContent
+                                    v-if="showDrawer"
                                     class="sm:w-[80%] mx-auto min-h-14"
                                 >
                                     <DrawerHeader>
                                         <DrawerTitle
-                                            >Are you absolutely
-                                            sure?</DrawerTitle
-                                        >
+                                            >Please Login In
+                                        </DrawerTitle>
                                         <DrawerDescription
-                                            >This action cannot be
-                                            undone.</DrawerDescription
-                                        >
+                                            >This action cannot be Done until to
+                                            login
+                                        </DrawerDescription>
                                     </DrawerHeader>
                                     <DrawerFooter>
-                                        <Button>Submit</Button>
+                                        <Button
+                                            variant="outline"
+                                            @click="$logWithGithub"
+                                            class="w-full mt-5 p-2 flex justify-center gap-x-3 items-center"
+                                        >
+                                            Github
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="25"
+                                                height="25"
+                                                viewBox="0 0 16 16"
+                                            >
+                                                <path
+                                                    class="fill-black dark:fill-white"
+                                                    fill-rule="evenodd"
+                                                    d="M7.976 0A7.977 7.977 0 0 0 0 7.976c0 3.522 2.3 6.507 5.431 7.584c.392.049.538-.196.538-.392v-1.37c-2.201.49-2.69-1.076-2.69-1.076c-.343-.93-.881-1.175-.881-1.175c-.734-.489.048-.489.048-.489c.783.049 1.224.832 1.224.832c.734 1.223 1.859.88 2.3.685c.048-.538.293-.88.489-1.076c-1.762-.196-3.621-.881-3.621-3.964c0-.88.293-1.566.832-2.153c-.05-.147-.343-.978.098-2.055c0 0 .685-.196 2.201.832c.636-.196 1.322-.245 2.007-.245s1.37.098 2.006.245c1.517-1.027 2.202-.832 2.202-.832c.44 1.077.146 1.908.097 2.104a3.16 3.16 0 0 1 .832 2.153c0 3.083-1.86 3.719-3.62 3.915c.293.244.538.733.538 1.467v2.202c0 .196.146.44.538.392A7.98 7.98 0 0 0 16 7.976C15.951 3.572 12.38 0 7.976 0"
+                                                    clip-rule="evenodd"
+                                                />
+                                            </svg>
+                                        </Button>
                                         <DrawerClose>
-                                            <Button variant="outline">
+                                            <Button
+                                                variant="outline"
+                                                class="flex w-full"
+                                            >
                                                 Cancel
                                             </Button>
                                         </DrawerClose>

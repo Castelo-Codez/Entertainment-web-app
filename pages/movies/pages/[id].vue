@@ -15,13 +15,12 @@ const {data}: any = await useFetch(url as string, {
     headers: {
         accept: "application/json",
         Authorization:
-            process.env.API_KEY as string,
+            "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4Zjc5NmUwMDExM2JkMDAwZDk4ZWE0YzI3MmY1ZmM5YyIsIm5iZiI6MTczMTA1MjQzNi44NTE5OTA3LCJzdWIiOiI2NzJiN2EzY2RlNTQ2NTg1ZDA0ZDk3YjkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.KD3HjY_D8OWtE4QY-dhaV6n5pIeiwk5Xvr8UqS9zrzg",
     },
     getCachedData(key) {
         return nuxtApp.payload.data[key] || nuxtApp.static.data[key];
     },
 });
-
 </script>
 
 <template>

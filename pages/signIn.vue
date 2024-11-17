@@ -47,6 +47,13 @@ function logWithGithub() {
                     />
                 </svg>
             </Button>
+            <Button
+                class="w-full mt-5 p-2 flex justify-center gap-x-3 items-center"
+            >
+                <RouterLink class="block w-full h-full" to="/">
+                    Back To Home Page
+                </RouterLink>
+            </Button>
 
             <p
                 class="text-center text-muted-foreground text-sm mt-5 md:max-w-[350px]"

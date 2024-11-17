@@ -6,7 +6,6 @@ export default NuxtAuthHandler({
     pages: {
         signIn: "/signIn",
         error: "/signIn",
-        signOut: "/",
     },
     providers: [
         // @ts-expect-error Use .default here for it to work during SSR.

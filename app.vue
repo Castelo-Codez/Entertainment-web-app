@@ -18,6 +18,7 @@ const headers = useRequestHeaders(["cookie"]) as HeadersInit;
 await callOnce(async () => {
     user.value = await $fetch("/api/users/getCurrentUser", {headers});
 });
+
 </script>
 
 <template>
